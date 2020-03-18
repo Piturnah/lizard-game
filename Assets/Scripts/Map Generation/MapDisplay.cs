@@ -8,6 +8,7 @@ public class MapDisplay : MonoBehaviour {
     public MeshFilter meshFilter;
     //[SerializeField]
     //MeshRenderer meshRenderer;
+    public MeshCollider meshCollider;
 
     public void DrawNoiseMap(float[,] noiseMap) {
         int width = noiseMap.GetLength(0);
@@ -30,5 +31,6 @@ public class MapDisplay : MonoBehaviour {
 
     public void DrawMesh(MeshData meshData) {
         meshFilter.sharedMesh = meshData.CreateMesh();
+        meshCollider.sharedMesh = meshFilter.sharedMesh;
     }
 }

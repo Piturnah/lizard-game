@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class MapGenerator : MonoBehaviour {
 
@@ -33,8 +34,9 @@ public class MapGenerator : MonoBehaviour {
         falloffMap = FalloffGenerator.GenerateFalloffMap(mapChunkSize);
     }
 
+    public static event Action newMapGenerated;
     public void GenerateMap() {
-        int seed = (worldSeed != "") ? ((int.TryParse(worldSeed, out int i))? i : worldSeed.GetHashCode()) : Random.Range(int.MinValue, int.MaxValue);
+        int seed = (worldSeed != "") ? ((int.TryParse(worldSeed, out int i))? i : worldSeed.GetHashCode()) : UnityEngine.Random.Range(int.MinValue, int.MaxValue);
         float[,] noiseMap = Noise.GenerateNoiseMap(mapChunkSize, mapChunkSize, seed, noiseScale, octaves, persistance, lacunarity);
         Debug.Log("World generated with seed: " + seed.ToString());
         if (useFalloff) {
@@ -55,6 +57,7 @@ public class MapGenerator : MonoBehaviour {
         else if (drawMode == DrawMode.FalloffMap) {
             display.DrawNoiseMap(FalloffGenerator.GenerateFalloffMap(mapChunkSize));
         }
+        newMapGenerated?.Invoke();
     }
 
     private void OnValidate() {
