@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class GridAStar : MonoBehaviour {
 
+    public bool onlyDisplayPathGizmos;
     public Transform testAgent;
     public LayerMask unwalkableMask;
     public Vector2 gridWorldSize;
@@ -20,6 +21,16 @@ public class GridAStar : MonoBehaviour {
         gridSizeY = Mathf.RoundToInt(gridWorldSize.y / nodeDiameter);
         CreateGrid();
         MapGenerator.newMapGenerated += CreateGrid;
+    }
+
+    private void OnDestroy() {
+        MapGenerator.newMapGenerated -= CreateGrid;
+    }
+
+    public int MaxSize {
+        get {
+            return gridSizeX * gridSizeY;
+        }
     }
 
     void CreateGrid() {
@@ -79,18 +90,28 @@ public class GridAStar : MonoBehaviour {
     public List<Node> path;
     private void OnDrawGizmos() {
         Gizmos.DrawWireCube(transform.position, new Vector3(gridWorldSize.x, 100, gridWorldSize.y));
-        
-        if (grid != null) {
-            Node agentNode = NodeFromWorldPoint(testAgent.position);
 
-            foreach (Node node in grid) {
-                Gizmos.color = (node.walkable) ? Color.white : Color.red;
-                if (path != null) {
-                    if (path.Contains(node)) {
-                        Gizmos.color = Color.black;
-                    }
+        if (onlyDisplayPathGizmos) {
+            if (path != null) {
+                foreach (Node node in path) {
+                    Gizmos.color = Color.black;
+                    Gizmos.DrawSphere(node.worldPosition, nodeRadius - .5f);
                 }
-                Gizmos.DrawCube(node.worldPosition, Vector3.one * (nodeDiameter - 1));
+            }
+        }
+        else {
+            if (grid != null) {
+                Node agentNode = NodeFromWorldPoint(testAgent.position);
+
+                foreach (Node node in grid) {
+                    Gizmos.color = (node.walkable) ? Color.white : Color.red;
+                    if (path != null) {
+                        if (path.Contains(node)) {
+                            Gizmos.color = Color.black;
+                        }
+                    }
+                    Gizmos.DrawSphere(node.worldPosition, (nodeRadius - .5f));
+                }
             }
         }
     }
